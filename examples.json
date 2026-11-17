@@ -1,0 +1,40 @@
+[
+  {
+    "label": "A",
+    "samples": null
+  },
+  {
+    "label": "A",
+    "samples": []
+  },
+  {
+    "label": "B",
+    "samples": [
+      null,
+      [],
+      [
+        null,
+        2,
+        -2
+      ]
+    ]
+  },
+  {
+    "label": "C",
+    "samples": [
+      [
+        9223372036854775807,
+        9223372036854775807
+      ]
+    ]
+  },
+  {
+    "label": "D",
+    "samples": [
+      [
+        null
+      ],
+      null
+    ]
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "python": "3.11",
+  "sample_data": "examples.json",
+  "commands": {
+    "init": [
+      "python3.11",
+      "-B",
+      "-m",
+      "tools.scenarios",
+      "init",
+      "./lab-lake"
+    ],
+    "tests": [
+      "python3.11",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-v"
+    ],
+    "verify": [
+      "python3.11",
+      "-B",
+      "-m",
+      "tools.scenarios",
+      "verify"
+    ],
+    "demo": [
+      "python3.11",
+      "-B",
+      "-m",
+      "tools.scenarios",
+      "demo",
+      "--samples",
+      "20000"
+    ]
+  }
+}
