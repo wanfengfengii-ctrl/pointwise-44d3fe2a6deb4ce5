@@ -1,7 +1,11 @@
-from monitorlake.service.requests import prepare_write_request, validate_snapshot_request
+"""Lake public entry points."""
+from monitorlake.service.requests import (
+    prepare_paged_request, prepare_write_request, validate_snapshot_request,
+)
 from monitorlake.service.results import to_write_result
 from monitorlake.service.lifecycle import LakeSession
 from monitorlake.intake.batch import collect_batch
+from monitorlake.intake.paged_batch import collect_paged_batch
 from monitorlake.catalog.publication import PublicationCoordinator
 from monitorlake.consumption.scan import SnapshotScan
 from monitorlake.consumption.rows import iter_rows
@@ -26,6 +30,22 @@ class Lake:
         )
         self._session.require_open()
         publication = self._publication.publish(candidate, self.before_commit)
+        return to_write_result(publication)
+
+    def write_paged(self, batch_id, source_description, rows, page_bytes):
+        self._session.require_open()
+        request = prepare_paged_request(
+            batch_id, source_description, rows, page_bytes
+        )
+        candidate = collect_paged_batch(
+            request.batch_id, request.source_description, request.rows,
+            request.page_bytes, self._session.stager,
+        )
+        self._session.require_open()
+        try:
+            publication = self._publication.publish(candidate, self.before_commit)
+        finally:
+            self._session.stager.discard(candidate.staged, suppress=True)
         return to_write_result(publication)
 
     def current_snapshot(self):

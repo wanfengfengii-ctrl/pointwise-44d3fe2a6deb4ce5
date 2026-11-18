@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import hashlib
 import json
+from monitorlake.intake.identity import iter_text_chunks
 from monitorlake.intake.source import SourceCursor
 from monitorlake.intake.ordinal import OrdinalAllocator
 from monitorlake.schema.normalization import normalize_observation
@@ -17,6 +18,13 @@ class CandidateBatch:
     @property
     def row_count(self):
         return len(self.records)
+
+    @property
+    def catalog_identity(self):
+        return self.identity
+
+    def identity_stream(self):
+        return iter_text_chunks(self.identity)
 
 
 def candidate_digest(identity):

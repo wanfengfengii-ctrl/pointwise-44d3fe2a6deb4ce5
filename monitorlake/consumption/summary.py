@@ -1,5 +1,4 @@
 from dataclasses import dataclass, asdict
-from monitorlake.consumption.rows import iter_rows
 
 
 @dataclass(frozen=True)
@@ -47,5 +46,4 @@ def summarize_row(row):
 
 
 def iter_summaries(scan):
-    for row in iter_rows(scan):
-        yield summarize_row(row)
+    yield from scan.iter_summaries()

@@ -19,15 +19,29 @@ class BatchStager:
         self.directory.mkdir(parents=True, exist_ok=True)
         self._owned = set()
 
+    def create(self, prefix, suffix=".tmp"):
+        """Create a tracked staging file and return ``(path, binary stream)``."""
+        fd, name = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=self.directory)
+        path = Path(name)
+        self._owned.add(path)
+        try:
+            return path, os.fdopen(fd, "wb")
+        except BaseException:
+            self._discard_path(path, suppress=True)
+            raise
+
+    def stage_path(self, path, descriptor):
+        if path not in self._owned:
+            raise StorageError("cannot stage unowned material")
+        return StagedBatch(path, descriptor)
+
     def stage(self, encoded):
         verify_digest(encoded.data, encoded.descriptor.digest, "encoded candidate")
         if len(encoded.data) != encoded.descriptor.byte_count:
             raise StorageError("encoded candidate length mismatch")
-        fd, name = tempfile.mkstemp(prefix="candidate-", suffix=".tmp", dir=self.directory)
-        path = Path(name)
-        self._owned.add(path)
+        path, stream = self.create("candidate-")
         try:
-            with os.fdopen(fd, "wb") as stream:
+            with stream:
                 stream.write(encoded.data)
                 stream.flush()
                 os.fsync(stream.fileno())
@@ -49,6 +63,9 @@ class BatchStager:
 
     def discard(self, staged, suppress=False):
         self._discard_path(staged.path, suppress=suppress)
+
+    def discard_path(self, path, suppress=False):
+        self._discard_path(Path(path), suppress=suppress)
 
     def mark_published(self, staged):
         if staged.path not in self._owned:

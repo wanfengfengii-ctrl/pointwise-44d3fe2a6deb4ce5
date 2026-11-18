@@ -43,10 +43,4 @@ def restore_observation(block, row_index):
 
 
 def iter_rows(scan):
-    for batch, block in scan.iter_blocks():
-        for ordinal in range(block.row_count):
-            scan.require_open()
-            yield RowRecord(
-                scan.snapshot_id, batch.batch_id, ordinal, batch.source_description,
-                restore_observation(block, ordinal),
-            )
+    yield from scan.iter_rows()

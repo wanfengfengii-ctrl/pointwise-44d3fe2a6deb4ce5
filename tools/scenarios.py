@@ -142,6 +142,12 @@ def verify():
         return 1
     with tempfile.TemporaryDirectory(prefix="monitorlake-verify-") as directory:
         check_business(Path(directory) / "lake")
+    import paged_examples
+    import tools.paged_checks as paged_checks
+    paged_examples.verify()
+    with tempfile.TemporaryDirectory(prefix="monitorlake-paged-verify-") as directory:
+        paged_checks.verify_checks(Path(directory) / "lake")
+    print("JOINT_VERIFY_OK")
     return 0
 
 
@@ -162,6 +168,11 @@ def main(argv=None):
         return 0
     with tempfile.TemporaryDirectory(prefix="monitorlake-demo-") as directory:
         check_business(Path(directory) / "lake", args.samples)
+    import paged_examples
+    import tools.paged_checks as paged_checks
+    paged_examples.demo()
+    with tempfile.TemporaryDirectory(prefix="monitorlake-paged-demo-") as directory:
+        paged_checks.demo_checks(Path(directory) / "lake", args.samples)
     return 0
 
 
